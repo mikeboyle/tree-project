@@ -22,21 +22,19 @@ int main()
     int items[] = {5, 3, 10, 15, 20, 7};
     for (int i = 0; i < 6; i++)
         handleInsert(tree, items[i]);
-    // tree.insert(5);
-    // tree.insert(10);
-    // tree.insert(15);
-    // tree.printPreOrder();
-    // tree.insert(20);
-    // tree.printPreOrder();
-    // tree.insert(30);
-    // tree.printPreOrder();
-    // tree.insert(40);
-    // tree.printPreOrder();
+    AVLTree<int> tree2(tree);
+    tree2.printInOrder();
+    tree.printInOrder();
+    AVLTree<int> tree3;
+    tree3.insert(50);
+    tree3.insert(40);
+    tree3.insert(30);
+    tree3.insert(20);
+    tree3.insert(10);
+    tree2 = tree3;
+    tree3.printInOrder();
+    tree2.printInOrder();
+    tree.printInOrder();
 
-    // AVLTree<int> tree2;
-    // tree2.insert(8);
-    // tree2.insert(7);
-    // tree2.insert(6);
-    // tree2.printPreOrder();
     return 0;
 }

@@ -31,7 +31,7 @@ private:
     // destroyTree deletes all of the nodes in the list
     void destroyTree();
     // copyTree copies the tree
-    void copyTree(const AVLTree<T> &);
+    void copyTree(node<T> *&, node<T> *);
 
     // ROTATION AND BALANCING FUNCTIONS
 
@@ -55,6 +55,8 @@ private:
 
 public:
     AVLTree();
+    AVLTree(const AVLTree<T> &);
+    const AVLTree<T> &operator=(const AVLTree<T> &);
     ~AVLTree();
     // insert adds a node to the tree
     void insert(const T &);

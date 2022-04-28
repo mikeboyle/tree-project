@@ -26,6 +26,23 @@ AVLTree<T>::~AVLTree()
 }
 
 template <class T>
+AVLTree<T>::AVLTree(const AVLTree<T> &other)
+{
+    copyTree(root, other.root);
+}
+
+template <class T>
+const AVLTree<T> &AVLTree<T>::operator=(const AVLTree<T> &other)
+{
+    if (this != &other)
+    {
+        destroyTree();
+        copyTree(root, other.root);
+    }
+    return *this;
+}
+
+template <class T>
 void AVLTree<T>::insert(const T &item)
 {
     bool taller = false;
@@ -159,6 +176,22 @@ void AVLTree<T>::destroyTree()
 }
 
 template <class T>
+void AVLTree<T>::copyTree(node<T> *&dest, node<T> *src)
+{
+    if (src == NULL)
+        dest = NULL;
+    else
+    {
+        dest = new node<T>;
+        dest->info = src->info;
+        dest->height = src->height;
+        dest->balance = src->balance;
+        copyTree(dest->left, src->left);
+        copyTree(dest->right, src->right);
+    }
+}
+
+template <class T>
 void AVLTree<T>::printPreOrder()
 {
     preOrder(root, [](node<T> *p)
@@ -180,5 +213,4 @@ void AVLTree<T>::printPostOrder()
     postOrder(root, [](node<T> *p)
               { cout << p->info << " "; });
     cout << endl;
-    cout << "root = " << root->info << endl;
 }
