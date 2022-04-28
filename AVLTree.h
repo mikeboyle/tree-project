@@ -33,7 +33,7 @@ private:
     // copyTree copies the tree
     void copyTree(const AVLTree<T> &);
 
-    // ROTATION FUNCTIONS
+    // ROTATION AND BALANCING FUNCTIONS
 
     // rotateLeft rotates the node to the left
     // by promoting the node p's right child to be p's parent
@@ -42,8 +42,16 @@ private:
     // by promoting the node p's left child to be p's parent
     void rotateRight(node<T> *&);
 
-    void balanceLeft(node<T> *&);
-    void balanceRight(node<T> *&);
+    // height returns the height of a node, returning -1 if node is null.
+    // Note that because we track the height in the node struct,
+    // this is not a recursive call; it only handles the case where node is null
+    int height(node<T> *);
+
+    // updateHeightAndBalance updates the height and balance factor of a node
+    void updateHeightAndBalance(node<T> *);
+
+    // balance checks if the subtree is unbalanced and carries out rotations if it is
+    void balance(node<T> *&);
 
 public:
     AVLTree();

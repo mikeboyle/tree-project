@@ -13,4 +13,5 @@ struct node
     node *left;
     node *right;
     int balance;
+    int height;
 };

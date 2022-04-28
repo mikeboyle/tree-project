@@ -33,6 +33,44 @@ void AVLTree<T>::insert(const T &item)
 }
 
 template <class T>
+int AVLTree<T>::height(node<T> *p)
+{
+    if (p == NULL)
+        return -1;
+    else
+        return p->height;
+}
+
+template <class T>
+void AVLTree<T>::updateHeightAndBalance(node<T> *p)
+{
+    if (p != NULL)
+    {
+        int leftHeight = height(p->left);
+        int rightHeight = height(p->right);
+        p->height = max(leftHeight, rightHeight) + 1;
+        p->balance = rightHeight - leftHeight;
+    }
+}
+
+template <class T>
+void AVLTree<T>::balance(node<T> *&p)
+{
+    if (p->balance < -1)
+    {
+        if (p->left->balance > 0)
+            rotateLeft(p->left);
+        rotateRight(p);
+    }
+    else if (p->balance > 1)
+    {
+        if (p->right->balance < 0)
+            rotateRight(p->right);
+        rotateLeft(p);
+    }
+}
+
+template <class T>
 void AVLTree<T>::insertNode(node<T> *&p, const T &item, bool &taller)
 {
     if (p == NULL)
@@ -42,124 +80,18 @@ void AVLTree<T>::insertNode(node<T> *&p, const T &item, bool &taller)
         p->left = NULL;
         p->right = NULL;
         p->balance = 0;
+        p->height = 0;
         taller = true;
     }
     else if (p->info == item)
         cout << "Error: duplicates not allowed" << endl; // TODO: Raise error
     else if (item < p->info)
-    {
         insertNode(p->left, item, taller);
-        if (taller)
-        {
-            if (p->balance == LEFT_TALLER)
-            {
-                balanceLeft(p);
-                taller = false;
-            }
-            else if (p->balance == RIGHT_TALLER)
-            {
-                p->balance = BALANCED;
-                taller = false;
-            }
-            else
-                p->balance = LEFT_TALLER;
-        }
-    }
     else
-    {
         insertNode(p->right, item, taller);
-        if (taller)
-        {
-            if (p->balance == RIGHT_TALLER)
-            {
-                balanceRight(p);
-                taller = false;
-            }
-            else if (p->balance == LEFT_TALLER)
-            {
-                p->balance = BALANCED;
-                taller = false;
-            }
-            else
-                p->balance = RIGHT_TALLER;
-        }
-    }
-}
 
-template <class T>
-void AVLTree<T>::balanceLeft(node<T> *&p)
-{
-    node<T> *l = p->left;
-
-    if (l->balance == LEFT_TALLER)
-    {
-        p->balance = BALANCED;
-        l->balance = BALANCED;
-        rotateRight(p);
-    }
-    else if (l->balance == RIGHT_TALLER)
-    {
-        node<T> *r = l->right;
-        if (r->balance == LEFT_TALLER)
-        {
-            p->balance = RIGHT_TALLER;
-            l->balance = BALANCED;
-        }
-        else if (r->balance == RIGHT_TALLER)
-        {
-            p->balance = BALANCED;
-            l->balance = LEFT_TALLER;
-        }
-        else
-        {
-            p->balance = BALANCED;
-            l->balance = BALANCED;
-        }
-        r->balance = BALANCED;
-        rotateLeft(l);
-        p->left = l;
-        rotateRight(p);
-    }
-    else
-        cout << "Error balancing left" << endl;
-}
-
-template <class T>
-void AVLTree<T>::balanceRight(node<T> *&p)
-{
-    node<T> *r = p->right;
-
-    if (r->balance == RIGHT_TALLER)
-    {
-        p->balance = BALANCED;
-        r->balance = BALANCED;
-        rotateLeft(p);
-    }
-    else if (r->balance == LEFT_TALLER)
-    {
-        node<T> *l = r->left;
-        if (l->balance == RIGHT_TALLER)
-        {
-            p->balance = LEFT_TALLER;
-            r->balance = BALANCED;
-        }
-        else if (l->balance == LEFT_TALLER)
-        {
-            p->balance = BALANCED;
-            r->balance = RIGHT_TALLER;
-        }
-        else
-        {
-            p->balance = BALANCED;
-            r->balance = BALANCED;
-        }
-        l->balance = BALANCED;
-        rotateRight(r);
-        p->right = r;
-        rotateLeft(p);
-    }
-    else
-        cout << "Error balancing right" << endl;
+    updateHeightAndBalance(p);
+    balance(p);
 }
 
 template <class T>
@@ -169,6 +101,8 @@ void AVLTree<T>::rotateLeft(node<T> *&p)
     node<T> *q = p->right;
     p->right = q->left;
     q->left = p;
+    updateHeightAndBalance(p);
+    updateHeightAndBalance(q);
     p = q;
 }
 
@@ -179,6 +113,8 @@ void AVLTree<T>::rotateRight(node<T> *&p)
     node<T> *q = p->left;
     p->left = q->right;
     q->right = p;
+    updateHeightAndBalance(p);
+    updateHeightAndBalance(q);
     p = q;
 }
 
