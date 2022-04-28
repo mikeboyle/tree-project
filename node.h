@@ -12,5 +12,5 @@ struct node
     T info;
     node *left;
     node *right;
-    int balanceFactor;
+    int balance;
 };

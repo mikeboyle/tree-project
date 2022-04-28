@@ -21,7 +21,7 @@ class AVLTree
 private:
     node<T> *root;
     // insertNode inserts a node in the tree
-    void insertNode(node<T> *&, const T &, bool);
+    void insertNode(node<T> *&, const T &, bool &);
     // inOrder traverses the tree in order and executes a function on the node
     void inOrder(node<T> *, function<void(node<T> *)>);
     // preOrder traverses the tree preorder and executes a function on the node
@@ -42,6 +42,9 @@ private:
     // by promoting the node p's left child to be p's parent
     void rotateRight(node<T> *&);
 
+    void balanceLeft(node<T> *&);
+    void balanceRight(node<T> *&);
+
 public:
     AVLTree();
     ~AVLTree();
@@ -53,10 +56,6 @@ public:
     void printPreOrder();
     // printPostOrder prints the tree elements postorder
     void printPostOrder();
-
-    // TODO: Remove after validating these work
-    void testRotateLeft();
-    void testRotateRight();
 };
 
 #endif

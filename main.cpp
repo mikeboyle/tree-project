@@ -17,16 +17,18 @@ int main()
     tree.insert(5);
     tree.insert(10);
     tree.insert(15);
-    tree.printPostOrder();
-    tree.testRotateLeft();
-    tree.printPostOrder();
+    tree.printPreOrder();
+    tree.insert(20);
+    tree.printPreOrder();
+    tree.insert(30);
+    tree.printPreOrder();
+    tree.insert(40);
+    tree.printPreOrder();
 
     AVLTree<int> tree2;
     tree2.insert(8);
     tree2.insert(7);
     tree2.insert(6);
-    tree2.printPostOrder();
-    tree2.testRotateRight();
-    tree2.printPostOrder();
+    tree2.printPreOrder();
     return 0;
 }
