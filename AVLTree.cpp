@@ -98,10 +98,11 @@ void AVLTree<T>::insertNode(node<T> *&p, const T &item, bool &taller)
         p->right = NULL;
         p->balance = 0;
         p->height = 0;
+        p->count = 1;
         taller = true;
     }
     else if (p->info == item)
-        cout << "Error: duplicates not allowed" << endl; // TODO: Raise error
+        p->count++;
     else if (item < p->info)
         insertNode(p->left, item, taller);
     else

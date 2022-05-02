@@ -14,4 +14,5 @@ struct node
     node *right;
     int balance;
     int height;
+    int count;
 };
