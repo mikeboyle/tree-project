@@ -18,24 +18,43 @@ using namespace std;
 class StyleChecker
 {
 private:
-    AVLTree<string> uniqueWords;
+    AVLTree<string> paragraphs;
+    AVLTree<string> sentences;
+    AVLTree<string> words;
     string inFilePath;
     string outFilePath;
 
-    int numSentences;
-    int totalSentenceLength;
+    // isSentenceDelimiter returns true if the character is '.', '!', or '?'
+    bool isSentenceDelimiter(const char &);
+
+    // parseFile opens the file and inserts lines (paragraphs)
+    // into the paragraphs tree
+    void parseFile();
+
+    // parseParagraphs traverses the paragraphs tree
+    // and inserts sentences into the sentences tree
+    void parseParagraphs();
+
+    // parseSentences traverses the sentences tree
+    // and inserts words into the words tree
+    void parseSentences();
+
+    void parseWords();
+
+    void analyzeText();
+
     int numWords;
     int totalWordLength;
 
     void handleParagraph(const string &);
     void handleSentence(const string &);
-    void handleToken(const string &);
+    void handleWord(const string &);
     string tokenizeWord(const string &);
 
 public:
     StyleChecker(const string &, const string & = "report.txt");
     ~StyleChecker();
-    void analyzeFile();
+    void analyze();
 };
 
 #endif

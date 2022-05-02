@@ -20,8 +20,9 @@ class AVLTree
 {
 private:
     node<T> *root;
+    int size;
     // insertNode inserts a node in the tree
-    void insertNode(node<T> *&, const T &, bool &);
+    void insertNode(node<T> *&, const T &);
     // inOrder traverses the tree in order and executes a function on the node
     void inOrder(node<T> *, function<void(node<T> *)>);
     // preOrder traverses the tree preorder and executes a function on the node
@@ -66,6 +67,10 @@ public:
     void printPreOrder();
     // printPostOrder prints the tree elements postorder
     void printPostOrder();
+    // inOrder traverses the tree in order and calls the supplied function on each node
+    void inOrder(function<void(T)>);
+    // getSize returns the size of the tree
+    int getSize();
 };
 
 #endif

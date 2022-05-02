@@ -9,14 +9,11 @@
 #include "AVLTree.h"
 #include <string>
 
-const int LEFT_TALLER = -1;
-const int RIGHT_TALLER = 1;
-const int BALANCED = 0;
-
 template <class T>
 AVLTree<T>::AVLTree()
 {
     root = NULL;
+    size = 0;
 }
 
 template <class T>
@@ -29,6 +26,7 @@ template <class T>
 AVLTree<T>::AVLTree(const AVLTree<T> &other)
 {
     copyTree(root, other.root);
+    size = other.size;
 }
 
 template <class T>
@@ -38,15 +36,21 @@ const AVLTree<T> &AVLTree<T>::operator=(const AVLTree<T> &other)
     {
         destroyTree();
         copyTree(root, other.root);
+        size = other.size;
     }
     return *this;
 }
 
 template <class T>
+int AVLTree<T>::getSize()
+{
+    return size;
+}
+
+template <class T>
 void AVLTree<T>::insert(const T &item)
 {
-    bool taller = false;
-    insertNode(root, item, taller);
+    insertNode(root, item);
 }
 
 template <class T>
@@ -88,7 +92,7 @@ void AVLTree<T>::balance(node<T> *&p)
 }
 
 template <class T>
-void AVLTree<T>::insertNode(node<T> *&p, const T &item, bool &taller)
+void AVLTree<T>::insertNode(node<T> *&p, const T &item)
 {
     if (p == NULL)
     {
@@ -99,14 +103,14 @@ void AVLTree<T>::insertNode(node<T> *&p, const T &item, bool &taller)
         p->balance = 0;
         p->height = 0;
         p->count = 1;
-        taller = true;
+        size++;
     }
     else if (p->info == item)
         p->count++;
     else if (item < p->info)
-        insertNode(p->left, item, taller);
+        insertNode(p->left, item);
     else
-        insertNode(p->right, item, taller);
+        insertNode(p->right, item);
 
     updateHeightAndBalance(p);
     balance(p);
@@ -145,6 +149,13 @@ void AVLTree<T>::inOrder(node<T> *p, function<void(node<T> *)> func)
         func(p);
         inOrder(p->right, func);
     }
+}
+
+template <class T>
+void AVLTree<T>::inOrder(function<void(T)> func)
+{
+    inOrder(root, [func](node<T> *p)
+            { func(p->info); });
 }
 
 template <class T>

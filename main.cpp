@@ -24,7 +24,7 @@ int main()
     // getline(cin, fileName);
 
     StyleChecker sc(fileName);
-    sc.analyzeFile();
+    sc.analyze();
     // AVLTree<int> tree;
     // int items[] = {5, 3, 10, 15, 20, 7};
     // for (int i = 0; i < 6; i++)

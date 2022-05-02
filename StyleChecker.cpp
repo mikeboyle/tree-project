@@ -11,16 +11,11 @@
 #include <fstream>
 #include "StyleChecker.h"
 
-const int NUM_DELIMITERS = 4;
-const char DELIMITERS[NUM_DELIMITERS] = {'.', '!', '?', '\n'};
-
 StyleChecker::StyleChecker(const string &in, const string &out)
 {
     inFilePath = in;
     outFilePath = out;
 
-    numSentences = 0;
-    totalSentenceLength = 0;
     numWords = 0;
     totalWordLength = 0;
 }
@@ -29,50 +24,52 @@ StyleChecker::~StyleChecker()
 {
 }
 
+void StyleChecker::parseParagraphs()
+{
+    paragraphs.inOrder([this](string p)
+                       { StyleChecker::handleParagraph(p); });
+}
+
+void StyleChecker::parseSentences()
+{
+    sentences.inOrder([this](string s)
+                      { StyleChecker::handleSentence(s); });
+}
+
+bool StyleChecker::isSentenceDelimiter(const char &c)
+{
+    return c == '.' || c == '!' || c == '?' || c == '\n';
+}
+
 void StyleChecker::handleParagraph(const string &paragraph)
 {
     // split paragraph into sentences
-    int start = 0;
-    int sentenceLength;
-    string sentence;
     char curr;
     bool delimiterFound;
-    int j;
+    int sentenceLength;
+    int start = 0;
 
     for (int i = 0; i < paragraph.length(); i++)
     {
         curr = paragraph[i];
-        j = 0;
-        delimiterFound = false;
-        while (j < NUM_DELIMITERS && !delimiterFound)
+        // If the current character is a sentence delimiter at the end of a sentence
+        // (NOT a . in $2.00 for example)
+        if (isSentenceDelimiter(curr) && (i == paragraph.length() - 1 || paragraph[i + 1] == ' '))
         {
-            if (curr == DELIMITERS[j] && (i == paragraph.length() - 1 || paragraph[i + 1] == ' '))
-            {
-                delimiterFound = true;
-                if (paragraph[start] == ' ')
-                    start++;
+            if (paragraph[start] == ' ') // Strip space from start of sentence
+                start++;
 
-                numSentences++;
-                sentenceLength = i - start;
-                totalSentenceLength += sentenceLength;
-                sentence = paragraph.substr(start, sentenceLength);
-                handleSentence(sentence);
-                start = i + 1;
-            }
-            else
-                j++;
+            sentenceLength = i - start;
+            sentences.insert(paragraph.substr(start, sentenceLength));
+            start = i + 1;
         }
     }
 }
 
 void StyleChecker::handleSentence(const string &sentence)
 {
-    cout << "Found a sentence of length " << sentence.length() << endl;
-    cout << sentence << endl;
-
     string word, token;
-    stringstream ss;
-    ss.str(sentence);
+    stringstream ss(sentence);
     int tokenLength;
 
     while (getline(ss, word, ' '))
@@ -81,18 +78,31 @@ void StyleChecker::handleSentence(const string &sentence)
         tokenLength = token.length();
         if (tokenLength > 0)
         {
-            cout << "token found! " << token << " length = " << token.length() << endl;
             numWords++;
             totalWordLength += tokenLength;
-            // handleToken(token);
+            words.insert(token);
         }
     }
-    cout << endl;
 }
 
-void StyleChecker::handleToken(const string &token)
+void StyleChecker::analyzeText()
 {
-    cout << token << " ";
+    cout << "FILE NAME: " << inFilePath << endl
+         << endl;
+
+    cout << "STATISTICAL SUMMARY" << endl;
+    cout << "TOTAL NUMBER OF WORDS: " << numWords << endl;
+    cout << "TOTAL NUMBER OF UNIQUE WORDS: " << words.getSize() << endl;
+    cout << "TOTAL NUMBER OF UNIQUE WORDS > 3 LETTERS: TBD" << endl;
+    cout << "AVERAGE WORD LENGTH: " << totalWordLength / numWords << " characters" << endl;
+    cout << "AVERAGE SENTENCE LENGTH: " << numWords / sentences.getSize() << " words" << endl
+         << endl;
+
+    cout << "STYLE WARNINGS" << endl;
+}
+
+void StyleChecker::handleWord(const string &word)
+{
 }
 
 string StyleChecker::tokenizeWord(const string &word)
@@ -111,21 +121,25 @@ string StyleChecker::tokenizeWord(const string &word)
     return s;
 }
 
-void StyleChecker::analyzeFile()
+void StyleChecker::parseFile()
 {
     string paragraph;
     fstream file(inFilePath, ios::in);
 
     if (file.is_open())
     {
-        cout << "Opened " << inFilePath << "!" << endl;
         while (getline(file, paragraph))
-        {
-            cout << "Next paragraph length = " << paragraph.length() << endl;
-            cout << paragraph << endl;
-            handleParagraph(paragraph);
-        }
+            paragraphs.insert(paragraph);
+
+        parseParagraphs();
+        parseSentences();
+        analyzeText();
     }
     else
         cout << "Could not open file " << inFilePath << endl;
+}
+
+void StyleChecker::analyze()
+{
+    parseFile();
 }
