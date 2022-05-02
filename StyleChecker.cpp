@@ -29,6 +29,11 @@ StyleChecker::~StyleChecker()
 {
 }
 
+string StyleChecker::getOutFilePath()
+{
+    return outFilePath;
+}
+
 void StyleChecker::parseParagraphs()
 {
     paragraphs.inOrder([this](string p)
@@ -43,13 +48,13 @@ void StyleChecker::parseSentences()
 
 void StyleChecker::analyzeLongWords()
 {
-    cout << "WORDS USED TOO OFTEN" << endl;
+    outFile << "WORDS USED TOO OFTEN" << endl;
 
     longWords.inOrder([this](treeNodeData<string> *w)
                       { StyleChecker::analyzeLongWordData(w); });
 
     if (numOverusedWords == 0)
-        cout << "None" << endl;
+        outFile << "None" << endl;
 }
 
 bool StyleChecker::isSentenceDelimiter(const char &c)
@@ -114,37 +119,38 @@ void StyleChecker::analyzeLongWordData(treeNodeData<string> *node)
     if (count > numLongWords * OVERUSE_THRESHOLD)
     {
         numOverusedWords++;
-        cout << numOverusedWords << ") " << word << " (" << count << " times)" << endl;
+        outFile << numOverusedWords << ") " << word << " (" << count << " times)" << endl;
     }
 }
 
 void StyleChecker::printIndex()
 {
-    cout << endl;
-    cout << "INDEX OF UNIQUE WORDS" << endl;
+    outFile << endl;
+    outFile << "INDEX OF UNIQUE WORDS" << endl;
     words.inOrder([this](string w)
                   {   if (currIndexHeading != w[0])
                       {
                           currIndexHeading = w[0];
                           char upper = toupper(currIndexHeading);
-                          cout << upper << endl;
+                          outFile << endl
+                                  << upper << endl;
                       }
-                      cout << w << endl; });
+                      outFile << w << endl; });
 }
 
 void StyleChecker::analyzeText()
 {
 
-    cout << "FILE NAME: " << inFilePath << endl
-         << endl;
+    outFile << "FILE NAME: " << inFilePath << endl
+            << endl;
 
-    cout << "STATISTICAL SUMMARY" << endl;
-    cout << "TOTAL NUMBER OF WORDS: " << numWords << endl;
-    cout << "TOTAL NUMBER OF UNIQUE WORDS: " << words.getSize() << endl;
-    cout << "TOTAL NUMBER OF UNIQUE WORDS > 3 LETTERS: " << longWords.getSize() << endl;
-    cout << "AVERAGE WORD LENGTH: " << totalWordLength / numWords << " characters" << endl;
-    cout << "AVERAGE SENTENCE LENGTH: " << numWords / sentences.getSize() << " words" << endl
-         << endl;
+    outFile << "STATISTICAL SUMMARY" << endl;
+    outFile << "TOTAL NUMBER OF WORDS: " << numWords << endl;
+    outFile << "TOTAL NUMBER OF UNIQUE WORDS: " << words.getSize() << endl;
+    outFile << "TOTAL NUMBER OF UNIQUE WORDS > 3 LETTERS: " << longWords.getSize() << endl;
+    outFile << "AVERAGE WORD LENGTH: " << totalWordLength / numWords << " characters" << endl;
+    outFile << "AVERAGE SENTENCE LENGTH: " << numWords / sentences.getSize() << " words" << endl
+            << endl;
 
     analyzeLongWords();
     printIndex();
@@ -175,13 +181,18 @@ void StyleChecker::parseFile()
     {
         while (getline(file, paragraph))
             paragraphs.insert(paragraph);
-
-        parseParagraphs();
-        parseSentences();
-        analyzeText();
     }
     else
         cout << "Could not open file " << inFilePath << endl;
+
+    parseParagraphs();
+    parseSentences();
+
+    outFile.open(outFilePath, ios::out);
+    if (outFile.is_open())
+        analyzeText();
+    else
+        cout << "Could not open file " << outFilePath << endl;
 }
 
 void StyleChecker::analyze()

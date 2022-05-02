@@ -6,42 +6,33 @@
  *
  */
 #include <iostream>
-#include "StyleChecker.h"
 #include <iostream>
+#include <fstream>
+#include "StyleChecker.h"
 
 using namespace std;
-
-// void handleInsert(AVLTree<int> &tree, const int &item)
-// {
-//     tree.insert(item);
-//     tree.printPreOrder();
-// }
 
 int main()
 {
     string fileName = "in.txt";
-    // cout << "Enter a file name: " << endl;
-    // getline(cin, fileName);
+    cout << "Enter a file name: ";
+    getline(cin, fileName);
 
     StyleChecker sc(fileName);
     sc.analyze();
-    // AVLTree<int> tree;
-    // int items[] = {5, 3, 10, 15, 20, 7};
-    // for (int i = 0; i < 6; i++)
-    //     handleInsert(tree, items[i]);
-    // AVLTree<int> tree2(tree);
-    // tree2.printInOrder();
-    // tree.printInOrder();
-    // AVLTree<int> tree3;
-    // tree3.insert(50);
-    // tree3.insert(40);
-    // tree3.insert(30);
-    // tree3.insert(20);
-    // tree3.insert(10);
-    // tree2 = tree3;
-    // tree3.printInOrder();
-    // tree2.printInOrder();
-    // tree.printInOrder();
+    cout << "Here is your report. A copy is also saved to " << sc.getOutFilePath() << "." << endl;
+
+    string paragraph;
+    string outFilePath = sc.getOutFilePath();
+    fstream file(outFilePath, ios::in);
+
+    if (file.is_open())
+    {
+        while (getline(file, paragraph))
+            cout << paragraph << endl;
+    }
+    else
+        cout << "Could not open file " << outFilePath << endl;
 
     return 0;
 }
