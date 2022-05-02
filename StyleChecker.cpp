@@ -118,6 +118,20 @@ void StyleChecker::analyzeLongWordData(treeNodeData<string> *node)
     }
 }
 
+void StyleChecker::printIndex()
+{
+    cout << endl;
+    cout << "INDEX OF UNIQUE WORDS" << endl;
+    words.inOrder([this](string w)
+                  {   if (currIndexHeading != w[0])
+                      {
+                          currIndexHeading = w[0];
+                          char upper = toupper(currIndexHeading);
+                          cout << upper << endl;
+                      }
+                      cout << w << endl; });
+}
+
 void StyleChecker::analyzeText()
 {
 
@@ -133,6 +147,7 @@ void StyleChecker::analyzeText()
          << endl;
 
     analyzeLongWords();
+    printIndex();
 }
 
 string StyleChecker::tokenizeWord(const string &word)

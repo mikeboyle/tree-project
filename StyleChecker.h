@@ -30,6 +30,7 @@ private:
     int numLongWords;
     int numOverusedWords;
     vector<string> overusedWords;
+    char currIndexHeading;
 
     // isSentenceDelimiter returns true if the character is '.', '!', or '?'
     bool isSentenceDelimiter(const char &);
@@ -58,6 +59,7 @@ private:
     void handleSentence(const string &);
     void analyzeLongWordData(treeNodeData<string> *);
     string tokenizeWord(const string &);
+    void printIndex();
 
 public:
     StyleChecker(const string &, const string & = "report.txt");
