@@ -11,6 +11,9 @@
 #include <fstream>
 #include "StyleChecker.h"
 
+const float OVERUSE_THRESHOLD = 0.05;
+const int LENGTH_THRESHOLD = 3;
+
 StyleChecker::StyleChecker(const string &in, const string &out)
 {
     inFilePath = in;
@@ -18,6 +21,8 @@ StyleChecker::StyleChecker(const string &in, const string &out)
 
     numWords = 0;
     totalWordLength = 0;
+    numLongWords = 0;
+    numOverusedWords = 0;
 }
 
 StyleChecker::~StyleChecker()
@@ -34,6 +39,17 @@ void StyleChecker::parseSentences()
 {
     sentences.inOrder([this](string s)
                       { StyleChecker::handleSentence(s); });
+}
+
+void StyleChecker::analyzeLongWords()
+{
+    cout << "WORDS USED TOO OFTEN" << endl;
+
+    longWords.inOrder([this](treeNodeData<string> *w)
+                      { StyleChecker::analyzeLongWordData(w); });
+
+    if (numOverusedWords == 0)
+        cout << "None" << endl;
 }
 
 bool StyleChecker::isSentenceDelimiter(const char &c)
@@ -82,27 +98,41 @@ void StyleChecker::handleSentence(const string &sentence)
             totalWordLength += tokenLength;
             words.insert(token);
         }
+        if (tokenLength > LENGTH_THRESHOLD)
+        {
+            numLongWords++;
+            longWords.insert(token);
+        }
+    }
+}
+
+void StyleChecker::analyzeLongWordData(treeNodeData<string> *node)
+{
+    string word = node->info;
+    int count = node->count;
+
+    if (count > numLongWords * OVERUSE_THRESHOLD)
+    {
+        numOverusedWords++;
+        cout << numOverusedWords << ") " << word << " (" << count << " times)" << endl;
     }
 }
 
 void StyleChecker::analyzeText()
 {
+
     cout << "FILE NAME: " << inFilePath << endl
          << endl;
 
     cout << "STATISTICAL SUMMARY" << endl;
     cout << "TOTAL NUMBER OF WORDS: " << numWords << endl;
     cout << "TOTAL NUMBER OF UNIQUE WORDS: " << words.getSize() << endl;
-    cout << "TOTAL NUMBER OF UNIQUE WORDS > 3 LETTERS: TBD" << endl;
+    cout << "TOTAL NUMBER OF UNIQUE WORDS > 3 LETTERS: " << longWords.getSize() << endl;
     cout << "AVERAGE WORD LENGTH: " << totalWordLength / numWords << " characters" << endl;
     cout << "AVERAGE SENTENCE LENGTH: " << numWords / sentences.getSize() << " words" << endl
          << endl;
 
-    cout << "STYLE WARNINGS" << endl;
-}
-
-void StyleChecker::handleWord(const string &word)
-{
+    analyzeLongWords();
 }
 
 string StyleChecker::tokenizeWord(const string &word)
@@ -142,4 +172,5 @@ void StyleChecker::parseFile()
 void StyleChecker::analyze()
 {
     parseFile();
+    // TODO: reset statistics for next run
 }

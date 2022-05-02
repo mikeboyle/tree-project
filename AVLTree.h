@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include "node.h"
+#include "treeNodeData.h"
 #include <functional>
 #include <string>
 
@@ -69,6 +70,8 @@ public:
     void printPostOrder();
     // inOrder traverses the tree in order and calls the supplied function on each node
     void inOrder(function<void(T)>);
+    // inOrder overload that traverses the tree and handles an instance of treeNodeData (info and count)
+    void inOrder(function<void(treeNodeData<T> *)>);
     // getSize returns the size of the tree
     int getSize();
 };

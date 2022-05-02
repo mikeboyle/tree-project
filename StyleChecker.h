@@ -12,6 +12,7 @@
 #include "AVLTree.cpp"
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -21,8 +22,14 @@ private:
     AVLTree<string> paragraphs;
     AVLTree<string> sentences;
     AVLTree<string> words;
+    AVLTree<string> longWords; // words longer than 3 letters
     string inFilePath;
     string outFilePath;
+    int numWords;
+    int totalWordLength;
+    int numLongWords;
+    int numOverusedWords;
+    vector<string> overusedWords;
 
     // isSentenceDelimiter returns true if the character is '.', '!', or '?'
     bool isSentenceDelimiter(const char &);
@@ -39,16 +46,17 @@ private:
     // and inserts words into the words tree
     void parseSentences();
 
+    // parseWords traverses the words tree
+    // and does some analysis on each word
     void parseWords();
+
+    void analyzeLongWords();
 
     void analyzeText();
 
-    int numWords;
-    int totalWordLength;
-
     void handleParagraph(const string &);
     void handleSentence(const string &);
-    void handleWord(const string &);
+    void analyzeLongWordData(treeNodeData<string> *);
     string tokenizeWord(const string &);
 
 public:

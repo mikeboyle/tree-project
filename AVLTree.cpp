@@ -159,6 +159,13 @@ void AVLTree<T>::inOrder(function<void(T)> func)
 }
 
 template <class T>
+void AVLTree<T>::inOrder(function<void(treeNodeData<T> *)> func)
+{
+    inOrder(root, [func](node<T> *p)
+            {treeNodeData<T> *d = new treeNodeData<T>; d->info = p->info; d->count = p->count; func(d); delete d; });
+}
+
+template <class T>
 void AVLTree<T>::preOrder(node<T> *p, function<void(node<T> *)> func)
 {
     if (p != NULL)
