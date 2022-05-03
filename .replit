@@ -1,0 +1,2 @@
+language = "cpp"
+run = "g++ --std=c++11 main.cpp StyleChecker.cpp -o main && ./main"
