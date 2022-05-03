@@ -2,3 +2,5 @@
 *.out
 main
 *.txt
+
+!in.txt
