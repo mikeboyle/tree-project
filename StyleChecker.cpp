@@ -72,7 +72,6 @@ void StyleChecker::handleParagraph(const string &paragraph)
 {
     // split paragraph into sentences
     char curr;
-    bool delimiterFound;
     int sentenceLength;
     int start = 0;
 
