@@ -36,22 +36,28 @@ string StyleChecker::getOutFilePath()
 
 void StyleChecker::parseParagraphs()
 {
-    paragraphs.inOrder([this](string p)
-                       { StyleChecker::handleParagraph(p); });
+    function<void(string)> callback = [this](string p)
+    { StyleChecker::handleParagraph(p); };
+
+    paragraphs.inOrder(callback);
 }
 
 void StyleChecker::parseSentences()
 {
-    sentences.inOrder([this](string s)
-                      { StyleChecker::handleSentence(s); });
+    function<void(string)> callback = [this](string s)
+    { StyleChecker::handleSentence(s); };
+
+    sentences.inOrder(callback);
 }
 
 void StyleChecker::analyzeLongWords()
 {
+    function<void(treeNodeData<string> * w)> callback = [this](treeNodeData<string> *w)
+    { StyleChecker::analyzeLongWordData(w); };
+
     outFile << "WORDS USED TOO OFTEN" << endl;
 
-    longWords.inOrder([this](treeNodeData<string> *w)
-                      { StyleChecker::analyzeLongWordData(w); });
+    longWords.inOrder(callback);
 
     if (numOverusedWords == 0)
         outFile << "None" << endl;
@@ -125,17 +131,25 @@ void StyleChecker::analyzeLongWordData(treeNodeData<string> *node)
 
 void StyleChecker::printIndex()
 {
+    function<void(string)> callback = [this](string w)
+    { printIndexEntry(w); };
+
     outFile << endl;
     outFile << "INDEX OF UNIQUE WORDS" << endl;
-    words.inOrder([this](string w)
-                  {   if (currIndexHeading != w[0])
-                      {
-                          currIndexHeading = w[0];
-                          char upper = toupper(currIndexHeading);
-                          outFile << endl
-                                  << upper << endl;
-                      }
-                      outFile << w << endl; });
+
+    words.inOrder(callback);
+}
+
+void StyleChecker::printIndexEntry(const string &w)
+{
+    if (currIndexHeading != w[0])
+    {
+        currIndexHeading = w[0];
+        char upper = toupper(currIndexHeading);
+        outFile << endl
+                << upper << endl;
+    }
+    outFile << w << endl;
 }
 
 void StyleChecker::analyzeText()
@@ -181,22 +195,46 @@ void StyleChecker::parseFile()
     {
         while (getline(file, paragraph))
             paragraphs.insert(paragraph);
+        file.close();
     }
     else
         cout << "Could not open file " << inFilePath << endl;
 
     parseParagraphs();
     parseSentences();
-
-    outFile.open(outFilePath, ios::out);
-    if (outFile.is_open())
-        analyzeText();
-    else
-        cout << "Could not open file " << outFilePath << endl;
 }
 
 void StyleChecker::analyze()
 {
     parseFile();
-    // TODO: reset statistics for next run
+
+    outFile.open(outFilePath, ios::out);
+    if (outFile.is_open())
+    {
+        analyzeText();
+        outFile.close();
+    }
+    else
+        cout << "Could not open file " << outFilePath << endl;
+
+    // reset summary statistics for next run
+    numWords = 0;
+    totalWordLength = 0;
+    numLongWords = 0;
+    numOverusedWords = 0;
+
+    char newCurrIdx;
+    currIndexHeading = newCurrIdx;
+
+    AVLTree<string> newParagraphs;
+    paragraphs = newParagraphs;
+
+    AVLTree<string> newSentences;
+    sentences = newSentences;
+
+    AVLTree<string> newWords;
+    words = newWords;
+
+    AVLTree<string> newLongWords;
+    longWords = newLongWords;
 }
