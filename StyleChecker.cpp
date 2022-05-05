@@ -7,12 +7,15 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <fstream>
 #include "StyleChecker.h"
 
 const float OVERUSE_THRESHOLD = 0.05;
 const int LENGTH_THRESHOLD = 3;
+const int WORD_LENGTH_WARNING_THRESHOLD = 5;
+const int SENTENCE_LENGTH_WARNING_THRESHOLD = 10;
 
 StyleChecker::StyleChecker(const string &in, const string &out)
 {
@@ -153,7 +156,9 @@ void StyleChecker::printIndexEntry(const string &w)
 
 void StyleChecker::analyzeText()
 {
-
+    double avgWordLength = (1.0 * totalWordLength) / numWords;
+    double avgSentenceLength = (1.0 * numWords / sentences.getSize());
+  
     outFile << "FILE NAME: " << inFilePath << endl
             << endl;
 
@@ -161,9 +166,18 @@ void StyleChecker::analyzeText()
     outFile << "TOTAL NUMBER OF WORDS: " << numWords << endl;
     outFile << "TOTAL NUMBER OF UNIQUE WORDS: " << words.getSize() << endl;
     outFile << "TOTAL NUMBER OF UNIQUE WORDS > 3 LETTERS: " << longWords.getSize() << endl;
-    outFile << "AVERAGE WORD LENGTH: " << totalWordLength / numWords << " characters" << endl;
-    outFile << "AVERAGE SENTENCE LENGTH: " << numWords / sentences.getSize() << " words" << endl
+    outFile << "AVERAGE WORD LENGTH: " << fixed << setprecision(2) << avgWordLength << " characters" << endl;
+    outFile << "AVERAGE SENTENCE LENGTH: " << avgSentenceLength << " words" << endl
             << endl;
+
+    outFile << "STYLE WARNINGS" << endl;
+    if (avgSentenceLength > SENTENCE_LENGTH_WARNING_THRESHOLD)
+      outFile << "Average sentence length is too long: " << avgSentenceLength << " words" << endl;
+    if (avgWordLength > WORD_LENGTH_WARNING_THRESHOLD)
+      outFile << "Average word length is too long: " << avgWordLength << " characters" << endl;
+    if (avgSentenceLength <= SENTENCE_LENGTH_WARNING_THRESHOLD && avgWordLength <= WORD_LENGTH_WARNING_THRESHOLD)
+      outFile << "None" << endl;
+    outFile << endl;
 
     analyzeLongWords();
     printIndex();
